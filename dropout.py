@@ -98,8 +98,9 @@ class Train_Test(object):
                 correct += (predicted.cpu() == label).sum()
                 len_ += label.size(0)
             total_loss /= len(self.train_load.dataset)
+            cr = correct/len_
             self.ls_tr.append(total_loss)
-            self.cr_tr.append(correct/len_)
+            self.cr_tr.append(cr)
             print('Epoch {} | loss: {:.6f}'.format(epoch, total_loss))
         self.plot_tool(self.ls_tr, self.cr_tr, self.p_val, self.meth, 'train')
             
@@ -120,8 +121,9 @@ class Train_Test(object):
                 len_ += label.size(0)
             perc = 100*(correct/len_)
             total_loss /= len(self.test_load.dataset)
+            cr = correct/len_
             self.ls_ts.append(total_loss)
-            self.cr_ts.append(correct/len_)
+            self.cr_ts.append(cr)
             print('Accuracy: {:.4f}%'.format(perc))
         self.plot_tool(self.ls_ts, self.cr_ts, self.p_val, self.meth, 'test')
         
@@ -132,7 +134,7 @@ class Train_Test(object):
         
         ax = fig.gca()
         ax.xaxis.set_major_formatter(tick.FormatStrFormatter('%0g'))
-        ax.xaxis.set_ticks(np.arange(0, self.n_epochs+5, 10))
+        ax.xaxis.set_ticks(np.arange(0, self.n_epochs+5, 2))
         
         ax_sec = ax.twinx()
         ax.set_autoscaley_on(False)
