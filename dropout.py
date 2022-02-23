@@ -64,20 +64,20 @@ class Train_Test(object):
         self.meth = method_
         
         self.train_load = data.DataLoader(
-            datasets.MNIST('../data', train=True, download=True, transform=transforms.ToTensor()), 
+            datasets.MNIST('./data', train=True, download=True, transform=transforms.ToTensor()), 
             batch_size=100, shuffle=True)
         
         self.test_load = data.DataLoader(
-            datasets.MNIST('../data', train=False, download=True, transform=transforms.ToTensor()), 
-            batch_size=1000, shuffle=False)
+            datasets.MNIST('./data', train=False, download=True, transform=transforms.ToTensor()), 
+            batch_size=100, shuffle=False)
         
         self.net = Network(method=method_, p=self.p_val)
         self.loss = nn.CrossEntropyLoss()
         self.optim = optim.SGD(self.net.parameters(), lr=lr)
         self.ls_tr = []
         self.cr_tr = []
-        self.ls_ts = []
-        self.cr_ts = []
+        #self.ls_ts = []
+        #self.cr_ts = []
         
     def train(self):
         self.net.train()
@@ -121,11 +121,12 @@ class Train_Test(object):
                 len_ += label.size(0)
             perc = 100*(correct.item()/len_)
             total_loss /= len(self.test_load.dataset)
-            cr = correct.item()/len_
-            self.ls_ts.append(total_loss)
-            self.cr_ts.append(cr)
-            print('Accuracy: {:.4f}%'.format(perc))
-        self.plot_tool(self.ls_ts, self.cr_ts, self.p_val, self.meth, 'test')
+            #cr = correct.item()/len_
+            #self.ls_ts.append(total_loss)
+            #self.cr_ts.append(cr)
+            print('Accuracy: {:.4f}% | loss: {:.6f}'.format(perc, total_loss))
+            
+        #self.plot_tool(self.ls_ts, self.cr_ts, self.p_val, self.meth, 'test')
         
     def plot_tool(self, ls, cr, p_val, met, run):
         fig = plt.figure(figsize=(20, 10))
@@ -146,6 +147,8 @@ class Train_Test(object):
         ax_sec.set_ylabel('Accuracy')
         ax.set_ylim(min(ls), max(ls))
         ax_sec.set_ylim(min(cr), max(cr))
+        ax.legend(loc="lower right")
+        ax_sec.legend(loc='upper right')
         
         plt.title('P value: {}, method: {}, {}'.format(p_val, met, run))
         plt.grid(True)
