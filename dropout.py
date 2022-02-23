@@ -110,7 +110,7 @@ class Train_Test(object):
             correct = 0
             len_ = 0
             total_loss = 0
-            for data_, label in enumerate(self.test_load):
+            for data_, label in self.test_load:
                 data_, label = Variable(data_).view(-1, self.dim), Variable(label)
                 output = self.net(data_)
                 _, predicted = torch.max(output.data, 1)
@@ -139,7 +139,7 @@ class Train_Test(object):
         ax_sec.set_autoscaley_on(False)
         
         ax.plot(ls, linestyle='--', color='b', label='Loss') 
-        ax_sec.plot(cr, linestyle='_.', color='m', label='accuracy')
+        ax_sec.plot(cr, linestyle='-', color='m', label='accuracy')
         ax.set_ylabel('Loss')
         ax_sec.set_ylabel('Accuracy')
         ax.set_ylim(0, max(ls))
