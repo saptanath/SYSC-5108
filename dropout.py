@@ -57,7 +57,7 @@ class Network(nn.Module):
         
     
 class Train_Test(object):
-    def __init__(self, n_epochs = 10, lr = 0.01, method_='standard', p=0.5):
+    def __init__(self, n_epochs = 50, lr = 0.01, method_='standard', p=0.5):
         self.n_epochs = n_epochs
         self.p_val = p
         self.dim = 28*28
@@ -87,10 +87,10 @@ class Train_Test(object):
             correct = 0
             len_ = 0
             for data_, label in self.train_load:
-                data_, label = Variable(data_).view(-1, self.dim), Variable(label)
+                data_, labels_ = Variable(data_).view(-1, self.dim), Variable(label)
                 output = self.net(data_)
                 _, predicted = torch.max(output.data, 1)
-                loss_ = self.loss(output, label)
+                loss_ = self.loss(output, labels_)
                 self.optim.zero_grad()
                 loss_.backward()
                 self.optim.step()
@@ -98,7 +98,7 @@ class Train_Test(object):
                 correct += (predicted.cpu() == label).sum()
                 len_ += label.size(0)
             total_loss /= len(self.train_load.dataset)
-            cr = correct/len_
+            cr = correct.item()/len_
             self.ls_tr.append(total_loss)
             self.cr_tr.append(cr)
             print('Epoch {} | loss: {:.6f}'.format(epoch, total_loss))
@@ -112,16 +112,16 @@ class Train_Test(object):
             len_ = 0
             total_loss = 0
             for data_, label in self.test_load:
-                data_, label = Variable(data_).view(-1, self.dim), Variable(label)
+                data_, labels_ = Variable(data_).view(-1, self.dim), Variable(label)
                 output = self.net(data_)
                 _, predicted = torch.max(output.data, 1)
-                loss_ = self.loss(output, label)
+                loss_ = self.loss(output, labels_)
                 correct += (predicted.cpu() == label).sum()
                 total_loss += float(loss_.data)
                 len_ += label.size(0)
-            perc = 100*(correct/len_)
+            perc = 100*(correct.item()/len_)
             total_loss /= len(self.test_load.dataset)
-            cr = correct/len_
+            cr = correct.item()/len_
             self.ls_ts.append(total_loss)
             self.cr_ts.append(cr)
             print('Accuracy: {:.4f}%'.format(perc))
@@ -144,8 +144,8 @@ class Train_Test(object):
         ax_sec.plot(cr, linestyle='-', color='m', label='accuracy')
         ax.set_ylabel('Loss')
         ax_sec.set_ylabel('Accuracy')
-        ax.set_ylim(0, max(ls))
-        ax_sec.set_ylim(0, max(cr))
+        ax.set_ylim(min(ls), max(ls))
+        ax_sec.set_ylim(min(cr), max(cr))
         
         plt.title('P value: {}, method: {}, {}'.format(p_val, met, run))
         plt.grid(True)
