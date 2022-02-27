@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as tick
 import numpy as np
 
+flag = True 
 
 class Gaussian(nn.Module):
     def __init__(self, p_val):
@@ -25,7 +26,7 @@ class Gaussian(nn.Module):
         self.std = p_val/(1-p_val)
         
     def forward(self, data):
-        if self.train():
+        if flag:
             epsilon = torch.normal(self.mean, self.std, size=data.size())
             epsilon = Variable(epsilon)
             return data*epsilon
@@ -57,7 +58,7 @@ class Network(nn.Module):
         
     
 class Train_Test(object):
-    def __init__(self, n_epochs = 50, lr = 0.01, method_='standard', p=0.5):
+    def __init__(self, n_epochs = 1, lr = 0.01, method_='standard', p=0.5):
         self.n_epochs = n_epochs
         self.p_val = p
         self.dim = 28*28
@@ -80,9 +81,10 @@ class Train_Test(object):
         #self.cr_ts = []
         
     def train(self):
+        global flag 
+        flag = True 
         self.net.train()
         for epoch in range(self.n_epochs):
-            epoch += 1
             total_loss = 0
             correct = 0
             len_ = 0
@@ -102,12 +104,13 @@ class Train_Test(object):
             self.ls_tr.append(total_loss)
             self.cr_tr.append(cr)
             print('Epoch {} | loss: {:.6f}'.format(epoch, total_loss))
-        self.plot_tool(self.ls_tr, self.cr_tr, self.p_val, self.meth, 'train')
+        #self.plot_tool(self.ls_tr, self.cr_tr, self.p_val, self.meth, 'train')
             
     def test(self):
+        global flag 
+        flag = False 
         self.net.eval()
         for epoch in range(self.n_epochs):
-            epoch += 1
             correct = 0
             len_ = 0
             total_loss = 0
@@ -160,13 +163,13 @@ class Train_Test(object):
         
 ## main function to run ##
 
-for p_ in np.arange(0.0, 1.1, 0.3):
-    standard = Train_Test(method_='standard', p=p_)
-    standard.train()
-    standard.test()
+# for p_ in np.arange(0.3, 1.1, 0.3):
+#     standard = Train_Test(method_='standard', p=p_)
+#     standard.train()
+#     standard.test()
 for p_ in np.arange(0.0, 1.1, 0.3):
     gauss = Train_Test(method_='gaussian', p=p_)
-    gauss.train()
+    #gauss.train()
     gauss.test()
             
         
