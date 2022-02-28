@@ -16,6 +16,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.ticker as tick
 import numpy as np
+import csv
 
 flag = True 
 
@@ -107,6 +108,7 @@ class Train_Test(object):
         #self.plot_tool(self.ls_tr, self.cr_tr, self.p_val, self.meth, 'train')
             
     def test(self):
+        log_line = []
         global flag 
         flag = False 
         self.net.eval()
@@ -130,6 +132,16 @@ class Train_Test(object):
             print('Accuracy: {:.4f}% | loss: {:.6f}'.format(perc, total_loss))
             
         #self.plot_tool(self.ls_ts, self.cr_ts, self.p_val, self.meth, 'test')
+        if self.meth == 'standard':
+            log_line.append(self.p_val)
+            log_line.append(perc)
+        else:
+            log_line.append('')
+            log_line.append('')
+            log_line.append(self.p_val)
+            log_line.append(perc)
+        self.log_steps(log_line)
+        
         
     def plot_tool(self, ls, cr, p_val, met, run):
         fig = plt.figure(figsize=(20, 10))
@@ -161,15 +173,40 @@ class Train_Test(object):
         plt.show(block=True)
         plt.close(fig)
         
+        
+        
+    def log_steps(self, line):
+        logFile = open("logs/log.csv", 'a', newline='', encoding='UTF8')
+        writer = csv.writer(logFile);
+        writer.writerow(line)
+        logFile.close()
+        
+def log_FileStart():
+        logFile = open("logs/log.csv", 'w', newline='', encoding='UTF8')
+        writer = csv.writer(logFile);    
+        header1 = []
+        header2 = []
+        header1.append('Standard')
+        header2.append('p value')
+        header2.append('accuracy')
+        header1.append('')
+        header1.append('Gaussian')
+        header2.append('p value')
+        header2.append('accuracy')
+        header1.append('')
+        writer.writerow(header1)
+        writer.writerow(header2)
+        logFile.close()
+        
 ## main function to run ##
-
+log_FileStart()
 # for p_ in np.arange(0.3, 1.1, 0.3):
 #     standard = Train_Test(method_='standard', p=p_)
 #     standard.train()
 #     standard.test()
 for p_ in np.arange(0.0, 1.1, 0.3):
     gauss = Train_Test(method_='gaussian', p=p_)
-    #gauss.train()
+    gauss.train()
     gauss.test()
             
         
